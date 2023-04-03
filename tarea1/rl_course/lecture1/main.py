@@ -17,14 +17,15 @@ count = 0
 
 while count < test :
     for iteration in range(num_iterations):
-        action = agent.get_action("random")
+        action = agent.get_action("epsilonGreedy")
         _, reward, _, _, _ = env.step(action)
-        agent.update(action, reward)
-    count = count + agent.rewardSum
+        agent.update(action, reward)    
+    average = average + agent.rewardSum
     agent.reset()
+    count += 1
 
-average = count/test
+average = average/test
 
-print('La Reconpensa total es: {}'.format(average))
+print('La Recompensa total es: {}'.format(average))
 
 env.close()
