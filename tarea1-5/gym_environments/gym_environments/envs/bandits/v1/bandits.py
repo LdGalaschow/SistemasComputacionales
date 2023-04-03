@@ -32,6 +32,8 @@ class TwoArmedBanditEnv(gym.Env):
         pygame.display.set_caption("Two-Armed Bandit Environment")
         self.action = None
         self.reward = None
+        self.rewardSum = 0
+        self.color = False
 
     def _get_obs(self):
         return 0
@@ -41,6 +43,7 @@ class TwoArmedBanditEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
+        self.rewardSum = 0
 
         if options is not None:
             if not isinstance(options, dict):
@@ -56,6 +59,11 @@ class TwoArmedBanditEnv(gym.Env):
         self.reward = self.arms[action].execute()
         observation = self._get_obs()
         info = self._get_info()
+        self.rewardSum += self.reward
+        if self.color:
+            self.color = False
+        else:
+            self.color = True    
 
         self.render()
         time.sleep(self.delay)
@@ -78,9 +86,20 @@ class TwoArmedBanditEnv(gym.Env):
 
         # Render the reward
         font = settings.FONTS["large"]
-        text_obj = font.render(f"{self.reward}", True, (255, 250, 26))
+        if self.color:
+            text_obj = font.render(f"{self.reward}", True, (255, 128, 20))
+        else:
+            text_obj = font.render(f"{self.reward}", True, (100, 100, 255))
+
         text_rect = text_obj.get_rect()
-        text_rect.center = (x, 80)
+        text_rect.center = (x, 110)
+        self.window.blit(text_obj, text_rect)
+
+        # Render the rewardSum
+        font = settings.FONTS["large"]
+        text_obj = font.render(f"Recompensa Total: ${self.rewardSum}", True, (255, 255, 255))
+        text_rect = text_obj.get_rect()
+        text_rect.center = (settings.WINDOW_WIDTH/2, 30)
         self.window.blit(text_obj, text_rect)
 
     def render(self):
